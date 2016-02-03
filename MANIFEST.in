@@ -1,0 +1,4 @@
+include README.md
+recursive-include suum/static *
+recursive-include suum/templates *
+recursive-include suum/apps *

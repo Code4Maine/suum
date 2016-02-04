@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/Code4Maine/suum.png?label=ready&title=Ready)](https://waffle.io/Code4Maine/suum)
 Suum
 ==============
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/code4maine/suum?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
     <meta name="theme-color" content="#2196F3">
-    <title>{% block page_title %}django outline 2.0{% endblock %}</title>
+    <title>{% block page_title %}suum - property visualizer{% endblock %}</title>
 
     <!-- CSS  -->
     <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet">
@@ -37,20 +37,10 @@
     {% block navigation %}
     <nav id="nav_f" class="default_color" role="navigation">
         <div class="container">
-            <div class="nav-wrapper"><a id="logo-container" href="/" class="brand-logo">Django Outline</a>
+            <div class="nav-wrapper"><a id="logo-container" href="/" class="brand-logo">SUUM - A property visualizer</a>
             <ul id="nav-mobile" class="right side-nav">
                 <li><a href="/#intro">Get Started</a></li>
                 <li><a href="/#work">Docs</a></li>
-		{% if not request.user.is_authenticated %}
-                <li><a href="{% url 'account_signup' %}">Signup</a></li>
-                <li><a href="{% url 'account_login' %}">Login</a></li>
-		{% else %}
-		<li>
-                <form method="post" id="logout-form" action="{% url 'account_logout' %}">{% csrf_token %}
-                <a href="#" onclick="$('#logout-form').submit();">Logout</a>
-		</form>
-		</li>
-		{% endif %}
                 <li><a href="https://github.com/powellc/outline" target="_blank"><i class="fa fa-github"></i> Github</a></li>
             </ul><a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
             </div>
@@ -84,7 +74,7 @@
                         <div class="input-field col s6">
                             <i class="mdi-action-account-circle prefix white-text"></i>
                             <input id="icon_prefix" type="text" class="validate white-text">
-                            <label for="icon_prefix" class="white-text">Colin Powell</label>
+                            <label for="icon_prefix" class="white-text">Code for Maine</label>
                         </div>
                         <div class="input-field col s6">
                         </div>
@@ -102,17 +92,14 @@
                 </form>
             </div>
             <div class="col l3 s12">
-                <h5 class="white-text">powellc</h5>
+                <h5 class="white-text">Code for Maine</h5>
                 <ul>
-                    <li><a class="white-text" href="http://www.onec.me/blog">Blog</a></li>
-                </ul>
-            </div>
-            <div class="col l3 s12">
-                <h5 class="white-text">Social</h5>
-                <ul>
+                  <li>
+                    <i class="fa fa-globe white-text"></i> 
+                    <a class="white-text" href="http://www.codeformaine.org/">Web</a></li>
                     <li>
-                        <a class="white-text" href="https://github.com/powellc/outline">
-                            <i class="small fa fa-github-square white-text"></i> Github
+                        <a class="white-text" href="https://github.com/code4maine/suum">
+                            <i class="fa fa-github-square white-text"></i> Github
                         </a>
                     </li>
                 </ul>
@@ -121,7 +108,7 @@
     </div>
     <div class="footer-copyright default_color">
         <div class="container">
-            Made by <a class="white-text" href="http://github.com/powellc">powellc</a>. Thanks to <a class="white-text" href="http://materializecss.com/">materializecss</a> and <a class="white-text" href="http://joashpereira.com">joashpereira.com</a>
+            Made by <a class="white-text" href="http://github.com/code4maine">code for maine</a>. Thanks to <a class="white-text" href="http://materializecss.com/">materializecss</a> and <a class="white-text" href="http://joashpereira.com">joashpereira.com</a>
         </div>
     </div>
 </footer>

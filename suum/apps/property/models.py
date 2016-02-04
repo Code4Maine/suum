@@ -1,3 +1,4 @@
+import time
 from django.db import models
 from geopy.geocoders.googlev3 import GoogleV3
 
@@ -50,20 +51,28 @@ class Property(models.Model):
                                      self.city, self.state)
 
     def save(self, *args, **kwargs):
-        location = ' '.join([self.street_number, self.street, self.city, self.state])
-        if location:
+        if self.street_number and self.street:
+            location = ' '.join([self.street_number, self.street, self.city, self.state])
             # TODO: Check if the location info has changed from the last save
             try:
-                g = GoogleV3()
-                result = g.geocode(location)
-                self.latitude = result.latitude
-                self.longitude = result.longitude
-            except GoogleV3.GeocoderQueryError:
-                pass
+                self.lookup_location(location)
+            except OSError:
+                print('Oops, Google dropped us. Wait 5 seconds and trying again ...')
+                time.sleep(5)
+                self.lookup_location(location)
             except Exception as e:
                 print ('%s', e)
 
         super(Property, self).save(*args, **kwargs)
+
+
+    def lookup_location(self, location):
+        g = GoogleV3()
+        result = g.geocode(location)
+        self.latitude = result.latitude
+        self.longitude = result.longitude
+
+        return result
 
 
 class Assessment(models.Model):

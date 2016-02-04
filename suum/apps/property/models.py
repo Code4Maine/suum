@@ -2,10 +2,6 @@ from django.db import models
 from geopy.geocoders.googlev3 import GoogleV3
 
 
-class Owner(models.Model):
-    name = models.CharField(max_length=255)
-
-
 class MailingAddress(models.Model):
     address_1 = models.CharField(max_length=255, blank=True, null=True)
     address_2 = models.CharField(max_length=255, blank=True, null=True)
@@ -14,19 +10,13 @@ class MailingAddress(models.Model):
     zipcode = models.CharField(max_length=10, blank=True, null=True)
 
 
-class Assessment(models.Model):
-    land = models.FloatField(blank=True, null=True)
-    building = models.FloatField(blank=True, null=True)
-    exemption = models.FloatField(blank=True, null=True)
-    tax_amount = models.FloatField(blank=True, null=True)
+class Owner(models.Model):
+    name = models.CharField(max_length=255)
+    name_2 = models.CharField(max_length=255, blank=True, null=True)
+    address = models.ForeignKey(MailingAddress, blank=True, null=True)
 
-    @property
-    def total(self):
-        return self.land + self.building
-
-    @property
-    def net(self):
-        return self.total - self.exemption
+    def __str__(self):
+        return self.name
 
 
 class Property(models.Model):
@@ -38,7 +28,7 @@ class Property(models.Model):
     map_lot = models.CharField(max_length=255, blank=True, null=True)
     book_page_1 = models.CharField(max_length=255, blank=True, null=True)
     book_page_2 = models.CharField(max_length=255, blank=True, null=True)
-    owners = models.ManyToManyField(Owner, blank=True, null=True)
+    owners = models.ManyToManyField(Owner, blank=True)
     acerage = models.FloatField(null=True, blank=True)
     neighborhood = models.IntegerField(null=True, blank=True)
     tree_growth = models.IntegerField(null=True, blank=True)
@@ -52,24 +42,52 @@ class Property(models.Model):
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = 'properties'
+
+    def __str__(self):
+        return '{0} {1}, {2}, {3}'.format(self.street_number, self.street,
+                                     self.city, self.state)
+
     def save(self, *args, **kwargs):
         location = ' '.join([self.street_number, self.street, self.city, self.state])
         if location:
-            if not self.latitude or not self.longitude:
-                try:
-                    g = geocoders.GoogleV3()
-                    result = g.geocode(location)
-                    self.latitude = result.latitude
-                    self.longitude = result.longitude
-                except GQueryError:
-                    pass
-                except Exception as e:
-                    print ('%s', e)
+            # TODO: Check if the location info has changed from the last save
+            try:
+                g = GoogleV3()
+                result = g.geocode(location)
+                self.latitude = result.latitude
+                self.longitude = result.longitude
+            except GoogleV3.GeocoderQueryError:
+                pass
+            except Exception as e:
+                print ('%s', e)
 
-        super(BaseGeo, self).save(*args, **kwargs)
+        super(Property, self).save(*args, **kwargs)
+
+
+class Assessment(models.Model):
+    assoc_property = models.ForeignKey(Property)
+    land = models.FloatField(blank=True, null=True)
+    building = models.FloatField(blank=True, null=True)
+    exemption = models.FloatField(blank=True, null=True)
+    tax_amount = models.FloatField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return 'Assessment of {0}'.format(self.assoc_property)
+
+    @property
+    def total(self):
+        return self.land + self.building
+
+    @property
+    def net(self):
+        return self.total - self.exemption
 
 
 class Building(models.Model):
+    assoc_property = models.ForeignKey(Property)
     style = models.IntegerField()
     dwelling_units = models.IntegerField()
     other_units = models.IntegerField()
@@ -105,14 +123,32 @@ class Building(models.Model):
     sq_footage = models.FloatField()
     condition = models.IntegerField()
     sq_living_area = models.FloatField()
-    commercial_occupancy_code = models.IntegerField()
-    commercial_dwelling_units = models.IntegerField()
+    comm_occupancy_code = models.IntegerField()
+    comm_dwelling_units = models.IntegerField()
+    comm_building_class = models.IntegerField()
+    comm_building_quality = models.IntegerField()
+    comm_grade_factor = models.IntegerField()
+    comm_exterior_walls = models.IntegerField()
+    comm_stories = models.IntegerField()
+    comm_height = models.IntegerField()
+    comm_ground_floor_area = models.IntegerField()
+    comm_perimeter = models.IntegerField()
+    comm_heating_cooling = models.IntegerField()
+    comm_year_built = models.IntegerField()
+    comm_year_remodeled = models.IntegerField()
+    comm_condition = models.IntegerField()
+    comm_sq_footage = models.FloatField()
+    model_name_type = models.CharField(max_length=255)
+    code = models.IntegerField()
+    year = models.IntegerField()
+    size = models.IntegerField()
 
-
+    def __str__(self):
+        return 'Building on {0}'.format(self.assoc_property)
 
 
 class Sale(models.Model):
-    property = models.ForeignKey(Property)
+    assoc_property = models.ForeignKey(Property)
     amount = models.FloatField()
     financing = models.IntegerField(default=0)
     date = models.DateField()
@@ -123,3 +159,6 @@ class Sale(models.Model):
     book_page = models.CharField(max_length=255)
     previous_owner = models.CharField(max_length=255)
     sale_type = models.IntegerField(default=0)
+
+    def __str__(self):
+        return 'Sale of {0}'.format(self.assoc_property)

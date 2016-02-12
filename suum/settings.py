@@ -36,6 +36,8 @@ class Common(Configuration):
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
 
+    YAHOO_CONSUMER_KEY = 'dj0yJmk9dGlEeUhmZk1URFdxJmQ9WVdrOVZYSk5SbkpFTjJVbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD03Yw--'
+    YAHOO_CONSUMER_SECRET = 'ddcec055856a87c65c3d59f915e9f2e1dbb602cb'
     # Application definition
 
     INSTALLED_APPS = (

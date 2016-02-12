@@ -1,6 +1,7 @@
 import time
+from django.conf import settings
 from django.db import models
-from geopy.geocoders.googlev3 import GoogleV3
+from geopy.geocoders import Nominatim
 
 
 class MailingAddress(models.Model):
@@ -54,23 +55,31 @@ class Property(models.Model):
         if self.street_number and self.street:
             location = ' '.join([self.street_number, self.street, self.city, self.state])
             # TODO: Check if the location info has changed from the last save
-            try:
-                self.lookup_location(location)
-            except OSError:
-                print('Oops, Google dropped us. Wait 5 seconds and trying again ...')
-                time.sleep(5)
-                self.lookup_location(location)
-            except Exception as e:
-                print ('%s', e)
+            if not self.latitude:
+                try:
+                    self.lookup_location(location)
+                except Exception as e:
+                    print ('%s', e)
 
         super(Property, self).save(*args, **kwargs)
 
+    @property
+    def property_delta(self):
+        try:
+            assess_15 = self.assessment_set.filter(date__year=2015)[0]
+            assess_14 = self.assessment_set.filter(date__year=2014)[0]
+            delta = assess_14.land - assess_15.land
+        except:
+            delta = None
+        return delta
+
 
     def lookup_location(self, location):
-        g = GoogleV3()
-        result = g.geocode(location)
+        geocoder = Nominatim()
+        result = geocoder.geocode(location)
         self.latitude = result.latitude
         self.longitude = result.longitude
+        time.sleep(1)
 
         return result
 
@@ -84,7 +93,7 @@ class Assessment(models.Model):
     date = models.DateField(blank=True, null=True)
 
     def __str__(self):
-        return 'Assessment of {0}'.format(self.assoc_property)
+        return '{0} assessment of {1}'.format(self.date.year, self.assoc_property)
 
     @property
     def total(self):
